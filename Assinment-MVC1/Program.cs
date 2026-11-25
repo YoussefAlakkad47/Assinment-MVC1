@@ -11,24 +11,47 @@ namespace Assinment_MVC1
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            app.UseExceptionHandler("/Home/Error"); // 1
+            app.UseStaticFiles();                   // 2
+
+            // Use · Run · Map
+            // الفرع ده لوحده على /pipeline.
+            // Run هنا بيقفل الفرع بس. لو اتحط على البايبلاين الأساسي الـ MVC مش هيشتغل.
+            ((IApplicationBuilder)app).Map("/pipeline", branch =>
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+                branch.Use(async (context, next) =>
+                {
+                    Console.Write("A ");
+                    await next(context);
+                    Console.Write("D ");
+                });
 
-            app.UseHttpsRedirection();
-            app.UseRouting();
+                branch.Use(async (context, next) =>
+                {
+                    Console.Write("B ");
+                    await next(context);
+                    Console.Write("C ");
+                });
 
-            app.UseAuthorization();
+                branch.Run(async context =>
+                {
+                    await context.Response.WriteAsync("Hi");
+                });
+            });
 
-            app.MapStaticAssets();
+            app.UseRouting();                       // 3
+            app.UseAuthorization();                 // 4
+
+            // specific route FIRST
+            app.MapControllerRoute(
+                name: "shop",
+                pattern: "shop/{id:int}",
+                defaults: new { controller = "Products", action = "Details" });
+
+            // general route LAST
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

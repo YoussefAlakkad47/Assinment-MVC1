@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "FromForm";
+}
+
+@* [FromForm]: الفورم دي بتبعت name للأكشن اللي فوقه [HttpPost] *@
+<form asp-action="FromFormDemo" method="post">
+    <label for="name">Name</label>
+    <input id="name" name="name" />
+    <button type="submit">Save</button>
+</form>

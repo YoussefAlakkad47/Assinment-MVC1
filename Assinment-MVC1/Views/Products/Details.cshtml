@@ -1,0 +1,11 @@
+@model Product
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Model.Name</h1>
+<p>Id: @Model.Id</p>
+@if (ViewData["Sort"] is string sort)
+{
+    <p>Sort: @sort</p>
+}
